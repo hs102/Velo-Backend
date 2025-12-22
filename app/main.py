@@ -1,40 +1,35 @@
-from fastapi import FastAPI, Header, HTTPException
-import os
-from dotenv import load_dotenv
-import jwt
+# main.py - FastAPI application entry point
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import db_ping
+from app.routers import auth
 
-load_dotenv()
+app = FastAPI(title="Task Manager API", version="1.0.0")
 
-app = FastAPI()
+# CORS setup - allow frontend to connect
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")
+# include routers
+app.include_router(auth.router)
 
 
 @app.on_event("startup")
-def _startup_db_check():
+def startup():
     try:
         db_ping()
-        print("DB OK")
+        print("Database connection: OK")
     except Exception as e:
-        print(f"DB FAIL: {e}")
+        print(f"Database connection: FAILED - {e}")
 
 
-@app.get("/sign-token")
-def sign_token():
-    user = {"id": 1, "username": "test", "password": "test"}
-    token = jwt.encode(user, JWT_SECRET, algorithm="HS256")
-    return {"token": token}
+@app.get("/")
+def root():
+    return {"message": "Task Manager API is running"}
 
-
-@app.post("/verify-token")
-def verify_token(Authorization: str = Header(None)):
-    if not Authorization:
-        raise HTTPException(status_code=401, detail="Missing Authorization header")
-    try:
-        token = Authorization.split(" ")[1]
-        decoded = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
-        return {"user": decoded}
-    except Exception as e:
-        raise HTTPException(status_code=401, detail=str(e))

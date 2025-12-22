@@ -3,11 +3,22 @@ import os
 from dotenv import load_dotenv
 import jwt
 
+from app.database import db_ping
+
 load_dotenv()
 
 app = FastAPI()
 
 JWT_SECRET = os.getenv("JWT_SECRET", "supersecret")
+
+
+@app.on_event("startup")
+def _startup_db_check():
+    try:
+        db_ping()
+        print("DB OK")
+    except Exception as e:
+        print(f"DB FAIL: {e}")
 
 
 @app.get("/sign-token")

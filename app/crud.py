@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.models import User
 from app.schemas import UserCreate
-from app.core.auth import hash_password
+from app.utils.password import hash_password
 
 
 # ============ USER CRUD ============

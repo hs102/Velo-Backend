@@ -3,7 +3,7 @@ from fastapi import Depends, HTTPException, status, Header
 from sqlalchemy.orm import Session
 
 from app.database import SessionLocal
-from app.core.auth import verify_token
+from app.utils.jwt import verify_token
 from app.crud import get_user_by_id
 
 
@@ -15,18 +15,18 @@ def get_db():
         db.close()
 
 
-def get_current_user(authorization: str = Header(None), db: Session = Depends(get_db)):
+def get_current_user(Authorization: str = Header(None), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     
-    if not authorization:
+    if not Authorization:
         raise credentials_exception
     
     try:
-        token = authorization.split(" ")[1]
+        token = Authorization.split(" ")[1]
     except IndexError:
         raise credentials_exception
     

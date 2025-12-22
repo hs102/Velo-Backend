@@ -1,11 +1,12 @@
-# Auth endpoints
+# Auth controller
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.dependencies import get_db, get_current_user
 from app.schemas import UserCreate, UserResponse, Token, UserLogin
 from app.crud import get_user_by_email, get_user_by_username, create_user
-from app.core.auth import verify_password, create_access_token
+from app.utils.password import verify_password
+from app.utils.jwt import create_access_token
 from app.models import User
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])

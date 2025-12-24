@@ -34,3 +34,30 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     user_id: Optional[int] = None
+
+
+# ============ PROJECT SCHEMAS ============
+
+class ProjectCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    color: Optional[str] = None
+
+
+class ProjectUpdate(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    color: Optional[str] = None
+
+
+class ProjectResponse(BaseModel):
+    id: int
+    name: str
+    description: Optional[str] = None
+    color: Optional[str] = None
+    user_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

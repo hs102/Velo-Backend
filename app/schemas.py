@@ -61,3 +61,38 @@ class ProjectResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ============ TASK SCHEMAS ============
+
+class TaskCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    priority: Optional[str] = "medium"
+    status: Optional[str] = "todo"
+    due_date: Optional[datetime] = None
+    project_id: int
+
+
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    status: Optional[str] = None
+    due_date: Optional[datetime] = None
+    project_id: Optional[int] = None
+
+
+class TaskResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str] = None
+    priority: str
+    status: str
+    due_date: Optional[datetime] = None
+    project_id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True

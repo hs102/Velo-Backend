@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import db_ping
-from app.controllers import auth, projects, tasks
+from app.controllers import auth, projects, tasks, ai
 
 app = FastAPI(title="Task Manager API", version="1.0.0")
 
@@ -20,6 +20,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(projects.router)
 app.include_router(tasks.router)
+app.include_router(ai.router)
 
 
 @app.on_event("startup")

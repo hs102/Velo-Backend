@@ -3,3 +3,5 @@ requirements.txt
 __pycache__/
 evil-plan.md
 Postman_Collection.json
+test_ai_direct.py
+test_ai.py

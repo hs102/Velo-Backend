@@ -26,39 +26,42 @@ def chat_with_ai(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    # Get user's projects and tasks
-    projects = crud.get_projects(db, current_user.id)
-    all_tasks = crud.get_tasks(db, current_user.id)
-    
-    # Build context
-    context = f"""You are a helpful task manager assistant for {current_user.username}.
+    try:
+        # Get user's projects and tasks
+        projects = crud.get_projects(db, current_user.id)
+        all_tasks = crud.get_tasks(db, current_user.id)
+        
+        # Build context
+        context = f"""You are a helpful task manager assistant for {current_user.username}.
 Current date: {datetime.now().strftime('%Y-%m-%d')}
 
 USER'S PROJECTS:
 """
-    
-    for project in projects:
-        project_tasks = [t for t in all_tasks if t.project_id == project.id]
-        context += f"\n- Project: {project.name}"
-        if project.description:
-            context += f" ({project.description})"
-        context += f"\n  Tasks ({len(project_tasks)}):"
         
-        for task in project_tasks:
-            context += f"\n    • {task.title} - Status: {task.status}, Priority: {task.priority}"
-            if task.due_date:
-                context += f", Due: {task.due_date.strftime('%Y-%m-%d')}"
-    
-    if not projects:
-        context += "\n(No projects yet)"
-    
-    context += f"\n\nUser question: {request.message}"
-    
-    # Call Gemini
-    model = genai.GenerativeModel('gemini-pro')
-    response = model.generate_content(context)
-    
-    return {
-        "response": response.text,
-        "user": current_user.username
-    }
+        for project in projects:
+            project_tasks = [t for t in all_tasks if t.project_id == project.id]
+            context += f"\n- Project: {project.name}"
+            if project.description:
+                context += f" ({project.description})"
+            context += f"\n  Tasks ({len(project_tasks)}):"
+            
+            for task in project_tasks:
+                context += f"\n    • {task.title} - Status: {task.status}, Priority: {task.priority}"
+                if task.due_date:
+                    context += f", Due: {task.due_date.strftime('%Y-%m-%d')}"
+        
+        if not projects:
+            context += "\n(No projects yet)"
+        
+        context += f"\n\nUser question: {request.message}"
+        
+        # Call Gemini
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        response = model.generate_content(context)
+        
+        return {
+            "response": response.text,
+            "user": current_user.username
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"AI Error: {str(e)}")

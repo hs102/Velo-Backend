@@ -9,7 +9,8 @@ alembic==1.12.1
 
 # Authentication - JWT and Password Hashing
 PyJWT==2.8.0
-passlib[bcrypt]==1.7.4
+passlib==1.7.4
+bcrypt==4.0.1
 
 # Environment variables
 python-dotenv==1.0.0

@@ -10,7 +10,12 @@ app = FastAPI(title="Task Manager API", version="1.0.0")
 # CORS setup - allow frontend to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "https://velo-backend-a2rv.onrender.com",
+        "https://velo-frontend-*.onrender.com",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -35,4 +40,9 @@ def startup():
 @app.get("/")
 def root():
     return {"message": "Task Manager API is running"}
+
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "message": "Task Manager API is running"}
 

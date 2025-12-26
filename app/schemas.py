@@ -1,7 +1,7 @@
 # Pydantic schemas
-from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, EmailStr
+from datetime import datetime, date
+from typing import Optional, Union
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 # ============ USER SCHEMAS ============
@@ -70,8 +70,34 @@ class TaskCreate(BaseModel):
     description: Optional[str] = None
     priority: Optional[str] = "medium"
     status: Optional[str] = "todo"
-    due_date: Optional[datetime] = None
+    due_date: Optional[Union[datetime, date, str]] = None
     project_id: int
+    
+    @field_validator('due_date', mode='before')
+class TaskUpdate(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    priority: Optional[str] = None
+    status: Optional[str] = None
+    due_date: Optional[Union[datetime, date, str]] = None
+    project_id: Optional[int] = None
+    
+    @field_validator('due_date', mode='before')
+    @classmethod
+    def parse_due_date(cls, v):
+        if v is None or isinstance(v, (datetime, date)):
+            return v
+        if isinstance(v, str):
+            try:
+                return datetime.strptime(v, '%Y-%m-%d')
+            except ValueError:
+                return datetime.fromisoformat(v.replace('Z', '+00:00'))
+        return v
+                return datetime.strptime(v, '%Y-%m-%d')
+            except ValueError:
+                # Try parsing datetime format
+                return datetime.fromisoformat(v.replace('Z', '+00:00'))
+        return v
 
 
 class TaskUpdate(BaseModel):

@@ -74,6 +74,18 @@ class TaskCreate(BaseModel):
     project_id: int
     
     @field_validator('due_date', mode='before')
+    @classmethod
+    def parse_due_date(cls, v):
+        if v is None or isinstance(v, (datetime, date)):
+            return v
+        if isinstance(v, str):
+            try:
+                return datetime.strptime(v, '%Y-%m-%d')
+            except ValueError:
+                return datetime.fromisoformat(v.replace('Z', '+00:00'))
+        return v
+
+
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
     description: Optional[str] = None
@@ -93,20 +105,6 @@ class TaskUpdate(BaseModel):
             except ValueError:
                 return datetime.fromisoformat(v.replace('Z', '+00:00'))
         return v
-                return datetime.strptime(v, '%Y-%m-%d')
-            except ValueError:
-                # Try parsing datetime format
-                return datetime.fromisoformat(v.replace('Z', '+00:00'))
-        return v
-
-
-class TaskUpdate(BaseModel):
-    title: Optional[str] = None
-    description: Optional[str] = None
-    priority: Optional[str] = None
-    status: Optional[str] = None
-    due_date: Optional[datetime] = None
-    project_id: Optional[int] = None
 
 
 class TaskResponse(BaseModel):

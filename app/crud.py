@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Session
 
 from app.models import User, Project, Task
-from app.schemas import UserCreate, ProjectCreate, ProjectUpdate, TaskCreate, TaskUpdate
+from app.schemas import UserCreate, UserUpdate, ProjectCreate, ProjectUpdate, TaskCreate, TaskUpdate
 from app.utils.password import hash_password
 
 
@@ -28,6 +28,42 @@ def create_user(db: Session, user: UserCreate):
         hashed_password=hashed_pwd
     )
     db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
+
+
+def update_user(db: Session, user_id: int, user_update: UserUpdate):
+    db_user = get_user_by_id(db, user_id)
+    if not db_user:
+        return None
+    
+    # Update email if provided
+    if user_update.email is not None:
+        # Check if email is already taken by another user
+        existing = db.query(User).filter(
+            User.email == user_update.email,
+            User.id != user_id
+        ).first()
+        if existing:
+            return None  # Email taken
+        db_user.email = user_update.email
+    
+    # Update username if provided
+    if user_update.username is not None:
+        # Check if username is already taken by another user
+        existing = db.query(User).filter(
+            User.username == user_update.username,
+            User.id != user_id
+        ).first()
+        if existing:
+            return None  # Username taken
+        db_user.username = user_update.username
+    
+    # Update password if provided
+    if user_update.password is not None:
+        db_user.hashed_password = hash_password(user_update.password)
+    
     db.commit()
     db.refresh(db_user)
     return db_user

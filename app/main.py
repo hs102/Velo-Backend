@@ -15,6 +15,7 @@ app.add_middleware(
         "http://localhost:5173",
         "https://velo-backend-a2rv.onrender.com",
         "https://velo-frontend-*.onrender.com",
+        "https://velo-frontend-app.vercel.app",
     ],
     allow_credentials=True,
     allow_methods=["*"],

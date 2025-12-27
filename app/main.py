@@ -10,13 +10,9 @@ app = FastAPI(title="Task Manager API", version="1.0.0")
 # CORS setup - allow frontend to connect
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "https://velo-frontend-app.vercel.app",
-    ],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_origins=["*"],  # Allow all origins temporarily for debugging
+    allow_credentials=False,  # Must be False when using wildcard
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

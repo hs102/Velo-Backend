@@ -26,8 +26,13 @@ app.include_router(ai.router)
 @app.on_event("startup")
 def startup():
     try:
+        # Create tables if they don't exist
+        from app.database import Base, engine
+        Base.metadata.create_all(bind=engine)
+        
         db_ping()
         print("Database connection: OK")
+        print("Database tables initialized")
     except Exception as e:
         print(f"Database connection: FAILED - {e}")
 
